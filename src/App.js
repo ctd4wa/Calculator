@@ -16,6 +16,7 @@ const btnValues = [
 const toLocaleString = (num) =>
   String(num).replace(/(?<!\..*)(\d)(?=(?:\d{3})+(?:\.|$))/g, "$1 ");
 
+// why isn't this removing spaces?
 const removeSpaces = (num) => num.toString().replace(/\s/g, "");
 
 const App = () => {
@@ -43,7 +44,7 @@ const App = () => {
     }
   };
 
-  const commaClickHandler = (e) => {
+  const periodClickHandler = (e) => {
     e.preventDefault();
     const value = e.target.innerHTML;
 
@@ -103,6 +104,7 @@ const App = () => {
     });
   };
 
+  // how does the percent button work on a calculator? 
   const percentClickHandler = () => {
     console.log("Percent clicked")
   };
@@ -138,7 +140,7 @@ const App = () => {
                   : btn === "/" || btn === "X" || btn === "-" || btn === "+"
                   ? signClickHandler
                   : btn === "."
-                  ? commaClickHandler
+                  ? periodClickHandler
                   : numClickHandler
               }
             />
