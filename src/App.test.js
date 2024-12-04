@@ -52,3 +52,26 @@ test('handles division by zero', () => {
   const screenElement = screen.getByText(/Can't divide with 0/);
   expect(screenElement).toBeInTheDocument();
 });
+
+test('clicking "." does not allow multiple decimal points', () => {
+  render(<App />);
+  fireEvent.click(screen.getByText("1"));
+  fireEvent.click(screen.getByText("."));
+  fireEvent.click(screen.getByText("."));
+  const screenElement = screen.getByText("1.");
+  expect(screenElement).toBeInTheDocument();
+});
+
+test('clicking "%" calculates percentage correctly', () => {
+  render(<App />);
+  fireEvent.click(screen.getByText("2"));
+  fireEvent.click(screen.getByText("5"));
+  fireEvent.click(screen.getByText("%"));
+  const screenElement = screen.getByText("0.25"); // 25% of 1 = 0.25
+  expect(screenElement).toBeInTheDocument();
+});
+
+
+
+
+
