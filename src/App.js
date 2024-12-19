@@ -12,10 +12,14 @@ const btnValues = [
   [0, ".", "="],
 ];
 
+// Utility to format numbers with fixed decimal precision
+const toFixedDecimal = (num, precision = 10) => {
+  return parseFloat(num.toFixed(precision));
+};
+
 const toLocaleString = (num) =>
   String(num).replace(/(?<!\..*)(\d)(?=(?:\d{3})+(?:\.|$))/g, "$1 ");
 
-// why isn't this removing spaces?
 const removeSpaces = (num) => num.toString().replace(/\s/g, "");
 
 const App = () => {
@@ -30,14 +34,13 @@ const App = () => {
     const value = e.target.innerHTML;
 
     if (removeSpaces(calc.num).length < 16) {
+      const newNum = calc.num === 0 && value === "0" ? "0" : calc.num + value;
       setCalc({
         ...calc,
         num:
-          calc.num === 0 && value === "0"
-            ? "0"
-            : removeSpaces(calc.num) % 1 === 0
-            ? toLocaleString(Number(removeSpaces(calc.num + value)))
-            : toLocaleString(calc.num + value),
+          removeSpaces(newNum) % 1 === 0
+            ? toLocaleString(Number(removeSpaces(newNum)))
+            : toLocaleString(toFixedDecimal(Number(newNum), 10)),
         res: !calc.sign ? 0 : calc.res,
       });
     }
@@ -67,20 +70,25 @@ const App = () => {
 
   const equalsClickHandler = () => {
     if (calc.sign && calc.num) {
-      const math = (a, b, sign) =>
-        sign === "+"
-          ? a + b
-          : sign === "-"
-          ? a - b
-          : sign === "X"
-          ? a * b
-          : a / b;
+      const math = (a, b, sign) => {
+        let result;
+        if (sign === "+") {
+          result = a + b;
+        } else if (sign === "-") {
+          result = a - b;
+        } else if (sign === "X") {
+          result = a * b;
+        } else if (sign === "/") {
+          result = b !== 0 ? a / b : "Can't divide by 0";
+        }
+        return toFixedDecimal(result, 10);
+      };
 
       setCalc({
         ...calc,
         res:
           calc.num === "0" && calc.sign === "/"
-            ? "Can't divide with 0"
+            ? "Can't divide by 0"
             : toLocaleString(
                 math(
                   Number(removeSpaces(calc.res)),
@@ -97,8 +105,8 @@ const App = () => {
   const invertClickHandler = () => {
     setCalc({
       ...calc,
-      num: calc.num ? toLocaleString(removeSpaces(calc.num) * -1) : 0,
-      res: calc.res ? toLocaleString(removeSpaces(calc.res) * -1) : 0,
+      num: calc.num ? toLocaleString(toFixedDecimal(removeSpaces(calc.num) * -1)) : 0,
+      res: calc.res ? toLocaleString(toFixedDecimal(removeSpaces(calc.res) * -1)) : 0,
       sign: "",
     });
   };
@@ -106,11 +114,11 @@ const App = () => {
   const percentClickHandler = () => {
     let num = calc.num ? parseFloat(calc.num) : 0;
     let res = calc.res ? parseFloat(calc.res) : 0;
-  
+
     setCalc({
       ...calc,
-      num: (num /= Math.pow(100, 1)),
-      res: (res /= Math.pow(100, 1)),
+      num: toFixedDecimal(num / 100),
+      res: toFixedDecimal(res / 100),
       sign: "",
     });
   };
